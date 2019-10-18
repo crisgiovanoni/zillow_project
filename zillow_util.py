@@ -128,7 +128,7 @@ def gaussian_scaler(X_train, X_test):
     scaled_X_train = gaussian_scaler.transform(X_train)
     scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
     # Scale Train and Convert to a Data Frame
-    scaled_y_test = uniform_scaler.transform(X_test)
+    scaled_y_test = gaussian_scaler.transform(X_test)
     scaled_y_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
     return scaled_X_train, scaled_X_test, gaussian_scaler
 
@@ -145,7 +145,7 @@ def generate_linear_model(scaled_X_df, y_df):
     """
     lm = LinearRegression()
     lm.fit(scaled_X_df, y_df)
-    lm.predict(X_train)
+    lm.predict(scaled_X_df)
     lm_intercept = lm.intercept_
     lm_coefficients = lm.coef_
     return lm, lm_intercept, lm_coefficients
