@@ -121,6 +121,18 @@ def standard_scaler(X_train, X_test):
     scaled_X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
     return scaled_X_train, scaled_X_test, standard_scaler
 
+def gaussian_scaler(X_train, X_test):
+    # Creates a Gaussian Scaler object and fit Train Data 
+    gaussian_scaler = PowerTransformer(method="yeo-johnson", standardize=False, copy=True).fit(X_train)
+    # Scale Train Data and Convert to a Data Frame
+    scaled_X_train = gaussian_scaler.transform(X_train)
+    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
+    # Scale Train and Convert to a Data Frame
+    scaled_y_test = uniform_scaler.transform(X_test)
+    scaled_y_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
+    return scaled_X_train, scaled_X_test, gaussian_scaler
+
+
 def generate_linear_model(scaled_X_df, y_df):
     """
     Generates linear model.
@@ -130,11 +142,10 @@ def generate_linear_model(scaled_X_df, y_df):
     y_df
     << Output:
     linear model
-    intercept of the linear model
-    coefficients of the linear model
     """
     lm = LinearRegression()
     lm.fit(scaled_X_df, y_df)
+    lm.predict(X_train)
     lm_intercept = lm.intercept_
     lm_coefficients = lm.coef_
     return lm, lm_intercept, lm_coefficients
@@ -166,6 +177,17 @@ def predict_on_test(lm, scaled_X_test):
 # lm_coefficients
 
 # yhat
+
+def gaussian_scaler(X_train, X_test):
+    # Creates a Gaussian Scaler object and fit Train Data 
+    gaussian_scaler = PowerTransformer(method="yeo-johnson", standardize=False, copy=True).fit(X_train)
+    # Scale Train Data and Convert to a Data Frame
+    scaled_X_train = gaussian_scaler.transform(X_train)
+    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
+    # Scale Train and Convert to a Data Frame
+    scaled_y_test = uniform_scaler.transform(X_test)
+    scaled_y_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
+    return scaled_X_train, scaled_X_test, gaussian_scaler
 
 # # =================================================== 
 
