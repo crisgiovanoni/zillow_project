@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler, QuantileTransformer, PowerTran
 # Model
 from sklearn.linear_model import LinearRegression
 
+#### ACQUIRE
 def get_db_url(db):
     """
     Produces a url from env credentials
@@ -61,6 +62,26 @@ def filter_zillow_baseline(df):
     # Drop all NaNs
     df = df.dropna()
     return df
+
+def filter_zillow(df):
+    """
+    Filters zillow query for baseline model with the following conditions: 
+    - Changes date data type from string to date
+    - Renames queried fields
+    >> Input:
+    data frame
+    << Output:
+    filtered data frame
+    """
+    # Filter Transaction Dates by boolean mask and loc
+    df.transactiondate = pd.to_datetime(df.transactiondate, format='%Y-%m-%d')
+    filter_dates = (df.transactiondate >= '2017-05-01') & (df.transactiondate <= '2017-06-30') 
+    df = df.loc[filter_dates]
+    # Rename columns
+    df = df.rename(columns={"calculatedfinishedsquarefeet": "sqft","bathroomcnt":"bathcnt","bedroomcnt":"bedcnt","transactiondate":"transdate","taxvaluedollarcnt":"propvalue","parcelid":"id"})
+    return df
+
+#### PRE-PROCESS
 
 def split_my_data(X, y, train_ratio=0.7):
     """
