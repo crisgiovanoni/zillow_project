@@ -44,7 +44,7 @@ def get_sql_zillow():
 def filter_zillow_baseline(df):
     """
     Filters zillow query for baseline model with the following conditions: 
-    - Fields: Parcel ID, Calculated Finished Square Footage, No. of Bathrooms, No. of Bedrooms, Last Transaction Date, Property Value
+    - Change date data type from string to date
     - Renames queried fields
     - Removes NaN
     >> Input:
@@ -97,7 +97,7 @@ def standard_scaler(X_train, X_test):
     scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
     # Scale Train and Convert to a Data Frame
     scaled_X_test = standard_scaler.transform(X_test)
-    scaled_X_test = pd.DataFrame(X_test, columns=X_test.columns).set_index([X_test.index])
+    scaled_X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
     return scaled_X_train, scaled_X_test, standard_scaler
 
 def generate_linear_model(scaled_X_df, y_df):
@@ -130,22 +130,22 @@ def predict_on_test(lm, scaled_X_test):
     yhat = lm.predict(scaled_X_test)
     return yhat
 
-# =========== TESTING ZILLOW FUNCTIONS ============== #
+# # =========== TESTING ZILLOW FUNCTIONS ============== #
 
-train_ratio = 0.7
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_ratio, random_state=123)
-len(X_train) #10998
-len(X_test) #4714
-len(y_train) #10998
-len(y_test) #4714
+# train_ratio = 0.7
+# X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_ratio, random_state=123)
+# len(X_train) #10998
+# len(X_test) #4714
+# len(y_train) #10998
+# len(y_test) #4714
 
-lm, lm_intercept, lm_coefficients = generate_linear_model(X_train,y_train)
-lm
-lm_intercept
-lm_coefficients
+# lm, lm_intercept, lm_coefficients = generate_linear_model(X_train,y_train)
+# lm
+# lm_intercept
+# lm_coefficients
 
-yhat
+# yhat
 
-# =================================================== 
+# # =================================================== 
 
 
