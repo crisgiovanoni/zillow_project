@@ -4,9 +4,6 @@ import numpy as np
 import env
 import seaborn as sns
 
-from pandas import ExcelWriter
-from pandas import ExcelFile
-
 # Split-scale
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, QuantileTransformer, PowerTransformer, MinMaxScaler, RobustScaler, Normalizer
@@ -16,10 +13,21 @@ from sklearn.linear_model import LinearRegression
 
 #### ACQUIRE
 
-fips = pd.read_excel('US_FIPS_Codes.xls', sheetname='3,142 U.S. Counties')
+# fips = pd.read_excel('fipxl.xlsx', sheet_name='fips_codes')
 
-print("Column headings:")
-print(df.columns)
+# SELECT fips, taxamount, taxvaluedollarcnt
+# FROM properties_2017
+# WHERE fips is not null and taxamount is not null and taxvaluedollarcnt is not null
+
+def get_zillow_dist():
+    query = '''
+    SELECT fips, taxamount, taxvaluedollarcnt
+    FROM properties_2017
+    WHERE fips is not null and taxamount is not null and taxvaluedollarcnt is not null
+    ''' 
+    df = pd.read_sql(query, get_db_url("zillow"))
+    return df
+
 
 def get_db_url(db):
     """
