@@ -2,15 +2,25 @@
 import pandas as pd
 import numpy as np
 import env
+import seaborn as sns
+
+from pandas import ExcelWriter
+from pandas import ExcelFile
 
 # Split-scale
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, QuantileTransformer, PowerTransformer, MinMaxScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler, QuantileTransformer, PowerTransformer, MinMaxScaler, RobustScaler, Normalizer
 
 # Model
 from sklearn.linear_model import LinearRegression
 
 #### ACQUIRE
+
+fips = pd.read_excel('US_FIPS_Codes.xls', sheetname='3,142 U.S. Counties')
+
+print("Column headings:")
+print(df.columns)
+
 def get_db_url(db):
     """
     Produces a url from env credentials
@@ -126,12 +136,41 @@ def gaussian_scaler(X_train, X_test):
     gaussian_scaler = PowerTransformer(method="yeo-johnson", standardize=False, copy=True).fit(X_train)
     # Scale Train Data and Convert to a Data Frame
     scaled_X_train = gaussian_scaler.transform(X_train)
-    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
+    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns.values).set_index([X_train.index.values])
     # Scale Train and Convert to a Data Frame
-    scaled_y_test = gaussian_scaler.transform(X_test)
-    scaled_y_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
+    scaled_X_test = gaussian_scaler.transform(X_test)
+    scaled_X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns.values).set_index([X_test.index.values])
     return scaled_X_train, scaled_X_test, gaussian_scaler
 
+def normalize_scaler(X_train, X_test):
+    scaler = Normalizer().fit(X_train)
+
+    scaled_X_train = scaler.transform(X_train)
+    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
+    
+    scaled_X_test = scaler.transform(X_test)
+    scaled_X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
+    return scaled_X_train, scaled_X_test, scaler
+
+def robust_scaler(X_train, X_test):
+    scaler = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(25.0, 75.0), copy=True).fit(X_train)
+
+    scaled_X_train = scaler.transform(X_train)
+    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
+    
+    scaled_X_test = scaler.transform(X_test)
+    scaled_X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
+    return scaled_X_train, scaled_X_test, scaler
+
+def quantile_scaler(X_train, X_test):
+    scaler = QuantileTransformer(n_quantiles=1000,output_distribution='normal',random_state=123,copy=True).fit(X_train)
+
+    scaled_X_train = scaler.transform(X_train)
+    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
+    
+    scaled_X_test = scaler.transform(X_test)
+    scaled_X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
+    return scaled_X_train, scaled_X_test, scaler
 
 def generate_linear_model(scaled_X_df, y_df):
     """
@@ -150,18 +189,16 @@ def generate_linear_model(scaled_X_df, y_df):
     lm_coefficients = lm.coef_
     return lm, lm_intercept, lm_coefficients
 
-def predict_on_test(lm, scaled_X_test):
-    """
-    Predict y based on scaled_X data
+def plot_residuals(X, y, df):
+    '''
+    Plots the residuals of a linear model.
     >> Input:
-    linear model
-    scaled_X_test_df
+    X
+    y
     << Output:
-    predicted y, a.k.a. yhat
-    """
-    yhat = lm.predict(scaled_X_test)
-    return yhat
-
+    seaborn plot
+    '''
+    return sns.residplot(X, y,df,lowess=True)
 # # =========== TESTING ZILLOW FUNCTIONS ============== #
 
 # train_ratio = 0.7
@@ -177,18 +214,6 @@ def predict_on_test(lm, scaled_X_test):
 # lm_coefficients
 
 # yhat
-
-def gaussian_scaler(X_train, X_test):
-    # Creates a Gaussian Scaler object and fit Train Data 
-    gaussian_scaler = PowerTransformer(method="yeo-johnson", standardize=False, copy=True).fit(X_train)
-    # Scale Train Data and Convert to a Data Frame
-    scaled_X_train = gaussian_scaler.transform(X_train)
-    scaled_X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns).set_index([X_train.index])
-    # Scale Train and Convert to a Data Frame
-    scaled_y_test = uniform_scaler.transform(X_test)
-    scaled_y_test = pd.DataFrame(scaled_X_test, columns=X_test.columns).set_index([X_test.index])
-    return scaled_X_train, scaled_X_test, gaussian_scaler
-
 # # =================================================== 
 
 
